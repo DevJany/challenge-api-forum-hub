@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V3__create-table-topicos.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V4__alter-table-usuarios-add-email-senha-column.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V5__create-table-respostas.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/db/migration/V7__create-table-usuarios_perfis.sql" dialect="MySQL" />
+  </component>
+</project>

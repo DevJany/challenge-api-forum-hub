@@ -1,0 +1,111 @@
+package com.devjany.api_forum_hub.controller;
+
+import com.devjany.api_forum_hub.domain.curso.CursoRepository;
+import com.devjany.api_forum_hub.domain.topico.*;
+import com.devjany.api_forum_hub.domain.usuario.Usuario;
+import com.devjany.api_forum_hub.domain.usuario.UsuarioRepository;
+import com.devjany.api_forum_hub.infra.exception.TratadorDeErros;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+
+@RestController
+@RequestMapping("topicos")
+public class TopicoController {
+
+    @Autowired
+    private TopicoRepository repository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CursoRepository cursoRepository;
+
+    @PostMapping
+    @Transactional
+    @Operation(summary = "Cadastra um tópico", security = @SecurityRequirement(name = "bearer-key"))
+    public ResponseEntity cadastrar(@RequestBody @Valid DadosCadastroTopico dados, UriComponentsBuilder uriBuilder,
+                                    @AuthenticationPrincipal Usuario usuario) {
+
+        if (repository.existsByTituloAndMensagem(dados.titulo(), dados.mensagem())) {
+            throw new TratadorDeErros.TopicoDuplicadoException("Já existe um tópico com esse título e mensagem.");
+        }
+
+        var autor = usuarioRepository.getReferenceById(usuario.getId());
+        var curso = cursoRepository.getReferenceById(dados.curso().id());
+        var topico = new Topico(dados, autor, curso);
+
+        repository.save(topico);
+
+        var uri = uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(new DadosDetalhamentoTopico(topico));
+    }
+
+    @Operation(summary = "Lista tópicos paginados do mais recente para o mais antigo", security = @SecurityRequirement(name = "bearer-key"))
+    @GetMapping
+    public ResponseEntity<Page<DadosListagemTopico>> listar(@PageableDefault(size = 10, sort = "data", direction = Sort.Direction.ASC) Pageable paginacao) {
+        var page = repository.findAll(paginacao).map(DadosListagemTopico::new);
+        return ResponseEntity.ok(page);
+    }
+
+    @Operation(summary = "Detalha um tópico", security = @SecurityRequirement(name = "bearer-key"))
+    @GetMapping("/{id}")
+    public ResponseEntity detalhar(@PathVariable Long id) {
+        var topico = repository.getReferenceById(id);
+        return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
+    }
+
+    @Operation(summary = "Atualiza um tópico", security = @SecurityRequirement(name = "bearer-key"))
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity atualizar(@PathVariable Long id, @RequestBody @Valid DadosAtualizacaoTopico dados,
+                                    @AuthenticationPrincipal Usuario usuario) {
+
+        var topico = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado"));
+
+        boolean isAdmin = usuario.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equalsIgnoreCase("ROLE_ADMINISTRADOR"));
+
+        if (!isAdmin && !topico.getAutor().getId().equals(usuario.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Você não tem permissão para atualizar este tópico.");
+        }
+
+        topico.atualizarInformacoes(dados);
+        return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
+    }
+
+    @Operation(summary = "Exclui um tópico", security = @SecurityRequirement(name = "bearer-key"))
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity excluir(@PathVariable Long id, @AuthenticationPrincipal Usuario usuario) {
+        var topico = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tópico não encontrado"));
+
+        boolean isAdmin = usuario.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equalsIgnoreCase("ROLE_ADMINISTRADOR"));
+
+        if (!isAdmin && !topico.getAutor().getId().equals(usuario.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Você não tem permissão para excluir este tópico.");
+        }
+
+        repository.delete(topico);
+        return ResponseEntity.noContent().build();
+    }
+}
