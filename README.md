@@ -8,14 +8,14 @@ API REST desenvolvida no Challenge Back End da **Alura + Oracle Next Education**
 
 ## 📋 Tabela de Conteúdos
 
-1.  [Sobre o Projeto](https://www.google.com/search?q=%231-sobre-o-projeto)
-2.  [Funcionalidades Principais](https://www.google.com/search?q=%232-funcionalidades-principais)
-3.  [Tecnologias](https://www.google.com/search?q=%233-tecnologias)
-4.  [Estrutura do Banco de Dados](https://www.google.com/search?q=%234-estrutura-do-banco-de-dados)
-5.  [Configuração e Execução](https://www.google.com/search?q=%235-configura%C3%A7%C3%A3o-e-execu%C3%A7%C3%A3o)
-6.  [Documentação da API](https://www.google.com/search?q=%236-documenta%C3%A7%C3%A3o-da-api)
-7.  [Créditos e Licença](https://www.google.com/search?q=%237-cr%C3%A9ditos-e-licen%C3%A7a)
-8.  [Autor](https://www.google.com/search?q=%238-autor)
+1. [Sobre o Projeto](#1-sobre-o-projeto)
+2. [Funcionalidades Principais](#2-funcionalidades-principais)
+3. [Tecnologias](#3-tecnologias)
+4. [Estrutura do Banco de Dados](#4-estrutura-do-banco-de-dados)
+5. [Configuração e Execução](#5-configuração-e-execução)
+6. [Documentação da API](#6-documentação-da-api)
+7. [Créditos e Licença](#7-créditos-e-licença)
+8. [Autor](#8-autor)
 
 -----
 
