@@ -15,7 +15,6 @@ API REST desenvolvida no Challenge Back End da **Alura + Oracle Next Education**
 5. [Configuração e Execução](#5-configuração-e-execução)
 6. [Documentação da API](#6-documentação-da-api)
 7. [Créditos e Licença](#7-créditos-e-licença)
-8. [Autor](#8-autor)
 
 -----
 
